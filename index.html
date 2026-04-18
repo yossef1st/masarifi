@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مصاريفي</title>
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: #0a0a0a;
+      color: #f0f0f0;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,255,255,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 90%, rgba(255,255,255,0.03) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-title {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      padding-top: 8px;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.04);
+      border: 0.5px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    }
+
+    .total-card {
+      padding: 36px 28px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .total-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.3);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .total-amount {
+      font-size: 3rem;
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .total-currency {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.3);
+      margin-top: 8px;
+      letter-spacing: 0.1em;
+    }
+
+    .pending-badge {
+      display: inline-block;
+      margin-top: 12px;
+      font-size: 0.7rem;
+      color: rgba(255,200,100,0.7);
+      letter-spacing: 0.05em;
+    }
+
+    .input-card {
+      padding: 24px;
+      margin-bottom: 12px;
+    }
+
+    .amount-input {
+      width: 100%;
+      background: rgba(255,255,255,0.06);
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 18px 20px;
+      font-size: 1.8rem;
+      font-weight: 300;
+      color: #fff;
+      text-align: center;
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 14px;
+      -webkit-appearance: none;
+    }
+
+    .amount-input::placeholder { color: rgba(255,255,255,0.2); }
+    .amount-input:focus {
+      border-color: rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .amount-input::-webkit-inner-spin-button,
+    .amount-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 16px;
+      border: 0.5px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 400;
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+    }
+
+    .btn:active { transform: scale(0.97); }
+
+    .btn-register {
+      background: rgba(255,255,255,0.9);
+      color: #0a0a0a;
+      border-color: transparent;
+    }
+
+    .btn-register:hover { background: #fff; }
+
+    .btn-tasdeed {
+      background: rgba(255,255,255,0.05);
+      color: rgba(255,255,255,0.7);
+    }
+
+    .btn-tasdeed:hover { background: rgba(255,255,255,0.08); }
+
+    .status-text {
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      margin-top: 12px;
+      letter-spacing: 0.05em;
+      min-height: 18px;
+    }
+
+    .status-text.ok { color: rgba(150,255,150,0.6); }
+    .status-text.warn { color: rgba(255,200,100,0.6); }
+    .status-text.err { color: rgba(255,100,100,0.6); }
+
+    .records-card {
+      padding: 20px 24px;
+    }
+
+    .records-toggle {
+      width: 100%;
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .records-toggle:hover { color: rgba(255,255,255,0.6); }
+
+    .toggle-icon {
+      font-size: 1rem;
+      transition: transform 0.3s;
+      display: inline-block;
+    }
+
+    .toggle-icon.open { transform: rotate(180deg); }
+
+    .records-list {
+      margin-top: 16px;
+      display: none;
+    }
+
+    .records-list.visible { display: block; }
+
+    .record-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 0.5px solid rgba(255,255,255,0.06);
+      font-size: 0.82rem;
+    }
+
+    .record-item:last-child { border-bottom: none; }
+
+    .record-date { color: rgba(255,255,255,0.3); }
+    .record-amount { color: rgba(255,255,255,0.85); font-weight: 400; }
+    .record-amount.tasdeed { color: rgba(150,255,150,0.6); }
+
+    .empty-records {
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 0.8rem;
+      padding: 20px 0;
+      letter-spacing: 0.05em;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass { animation: fadeIn 0.4s ease both; }
+    .total-card { animation-delay: 0.05s; }
+    .input-card { animation-delay: 0.1s; }
+    .records-card { animation-delay: 0.15s; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <p class="app-title">مصاريفي</p>
+
+    <div class="glass total-card">
+      <div class="total-label">المجموع الحالي</div>
+      <div class="total-amount" id="total">٠</div>
+      <div class="total-currency">دينار عراقي</div>
+      <div class="pending-badge" id="pending-badge"></div>
+    </div>
+
+    <div class="glass input-card">
+      <input type="number" class="amount-input" id="amount" placeholder="٠" />
+      <div class="btn-row">
+        <button class="btn btn-register" onclick="addExpense()">تسجيل</button>
+        <button class="btn btn-tasdeed" onclick="tasdeed()">تسديد</button>
+      </div>
+      <div class="status-text" id="status"></div>
+    </div>
+
+    <div class="glass records-card">
+      <button class="records-toggle" onclick="toggleRecords()">
+        <span>السجل</span>
+        <span class="toggle-icon" id="toggle-icon">⌄</span>
+      </button>
+      <div class="records-list" id="records-list">
+        <div class="empty-records" id="records-content">جارٍ التحميل...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwV0PBoD6IuTDJiRiLPCdFhCeNDytkhezRxpCySGui1uM6GnWmqBzPpCsgWvmBAIvGvuw/exec';
+    let pendingQueue = JSON.parse(localStorage.getItem('pendingQueue') || '[]');
+    let recordsOpen = false;
+
+    function now() {
+      const d = new Date();
+      return {
+        date: d.toISOString().split('T')[0],
+        time: d.toTimeString().slice(0,5)
+      };
+    }
+
+    function setStatus(msg, type='') {
+      const s = document.getElementById('status');
+      s.textContent = msg;
+      s.className = 'status-text ' + type;
+    }
+
+    function updatePendingBadge() {
+      const b = document.getElementById('pending-badge');
+      b.textContent = pendingQueue.length > 0 ? `${pendingQueue.length} سجل بانتظار الإرسال` : '';
+    }
+
+    async function sendToSheet(data) {
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(data)
+      });
+      if (!res.ok) throw new Error('فشل');
+    }
+
+    async function syncPending() {
+      if (pendingQueue.length === 0) return;
+      const toSync = [...pendingQueue];
+      for (const item of toSync) {
+        await sendToSheet(item);
+        pendingQueue.shift();
+        localStorage.setItem('pendingQueue', JSON.stringify(pendingQueue));
+      }
+      updatePendingBadge();
+    }
+
+    async function addExpense() {
+      const val = document.getElementById('amount').value;
+      if (!val || parseFloat(val) <= 0) return setStatus('أدخل مبلغاً صحيحاً', 'err');
+      const {date, time} = now();
+      const data = {date, time, amount: parseFloat(val), type: 'صرف'};
+      document.getElementById('amount').value = '';
+      setStatus('جارٍ الإرسال...', '');
+      try {
+        await syncPending();
+        await sendToSheet(data);
+        setStatus('تم التسجيل', 'ok');
+      } catch {
+        pendingQueue.push(data);
+        localStorage.setItem('pendingQueue', JSON.stringify(pendingQueue));
+        setStatus('حُفظ محلياً، سيُرسل عند الاتصال', 'warn');
+        updatePendingBadge();
+      }
+      loadTotal();
+    }
+
+    async function tasdeed() {
+      if (!confirm('تأكيد التسديد؟ سيبدأ العداد من الصفر.')) return;
+      const {date, time} = now();
+      const total = await calcTotal();
+      const data = {date, time, amount: total, type: 'تسديد'};
+      setStatus('جارٍ الإرسال...', '');
+      try {
+        await syncPending();
+        await sendToSheet(data);
+        setStatus('تم تسجيل التسديد', 'ok');
+      } catch {
+        pendingQueue.push(data);
+        localStorage.setItem('pendingQueue', JSON.stringify(pendingQueue));
+        setStatus('حُفظ محلياً', 'warn');
+        updatePendingBadge();
+      }
+      loadTotal();
+    }
+
+    async function getSheetData() {
+      const res = await fetch(SCRIPT_URL + '?t=' + Date.now());
+      const data = await res.json();
+      return data.values || [];
+    }
+
+    async function calcTotal() {
+      try {
+        const rows = await getSheetData();
+        const data = rows.slice(1);
+        let lastTasdeed = -1;
+        data.forEach((r, i) => { if (r[3] === 'تسديد') lastTasdeed = i; });
+        const after = data.slice(lastTasdeed + 1);
+        return after.filter(r => r[3] === 'صرف').reduce((s, r) => s + parseFloat(r[2] || 0), 0);
+      } catch { return 0; }
+    }
+
+    async function loadTotal() {
+      try {
+        const total = await calcTotal();
+        document.getElementById('total').textContent = total.toLocaleString('ar-IQ');
+      } catch {
+        document.getElementById('total').textContent = '—';
+      }
+    }
+
+    function toggleRecords() {
+      recordsOpen = !recordsOpen;
+      const list = document.getElementById('records-list');
+      const icon = document.getElementById('toggle-icon');
+      list.classList.toggle('visible', recordsOpen);
+      icon.classList.toggle('open', recordsOpen);
+      if (recordsOpen) loadRecords();
+    }
+
+    async function loadRecords() {
+      const content = document.getElementById('records-content');
+      content.innerHTML = '<div class="empty-records">جارٍ التحميل...</div>';
+      try {
+        const rows = await getSheetData();
+        const data = rows.slice(1);
+        let lastTasdeed = -1;
+        data.forEach((r, i) => { if (r[3] === 'تسديد') lastTasdeed = i; });
+        const after = data.slice(lastTasdeed + 1);
+        if (after.length === 0) {
+          content.innerHTML = '<div class="empty-records">لا توجد سجلات</div>';
+          return;
+        }
+        content.innerHTML = after.reverse().map(r => `
+          <div class="record-item">
+            <span class="record-date">${r[0]} ${r[1]}</span>
+            <span class="record-amount ${r[3]==='تسديد'?'tasdeed':''}">${parseFloat(r[2]).toLocaleString('ar-IQ')} د.ع</span>
+          </div>`).join('');
+      } catch {
+        content.innerHTML = '<div class="empty-records">تعذر التحميل</div>';
+      }
+    }
+
+    window.addEventListener('online', () => { syncPending(); setStatus('', ''); });
+    updatePendingBadge();
+    loadTotal();
+  </script>
+</body>
+</html>
